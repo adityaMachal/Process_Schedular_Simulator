@@ -15,7 +15,7 @@ def draw_gantt_chart(timeline):
 
         plt.barh(0, duration, left=start, height=0.5, align='center',
                  color=colors[pid], edgecolor="black")
-
+    #added idle time for gantt chart
         text_color = 'black' if np.array_equal(colors[pid], np.array([0.5, 0.5, 0.5])) else 'white'
         display_name = f"P{pid}" if isinstance(pid, int) else "Idle"
 
