@@ -13,7 +13,7 @@ def lottery_scheduling(processes, quantum=2):
         print("Quantum must be greater than 0. Setting default to 2.")
         quantum = 2
 
-    # Sort processes by arrival time to handle arrivals correctly
+    
     processes.sort(key=lambda p: p.arrival_time)
     time = 0
     timeline = []
@@ -21,18 +21,17 @@ def lottery_scheduling(processes, quantum=2):
     index = 0
     n = len(processes)
 
-    # Assign tickets based on priority (higher priority = lower number = more tickets)
-    # If no priority is provided, assume equal tickets (e.g., 100 tickets each)
+    
     total_tickets = 0
     ticket_mapping = {}
     for p in processes:
-        tickets = p.priority if p.priority is not None else 100  # Default 100 tickets if no priority
-        tickets = max(1, 1000 - tickets * 100)  # Convert priority to tickets (lower priority value = more tickets)
-        ticket_mapping[p.pid] = (total_tickets, total_tickets + tickets - 1)  # Range of tickets for this process
+        tickets = p.priority if p.priority is not None else 100  
+        tickets = max(1, 1000 - tickets * 100) 
+        ticket_mapping[p.pid] = (total_tickets, total_tickets + tickets - 1) 
         total_tickets += tickets
 
     while index < n or queue:
-        # Add arriving processes to the queue
+        
         while index < n and processes[index].arrival_time <= time:
             queue.append(processes[index])
             index += 1
@@ -44,9 +43,7 @@ def lottery_scheduling(processes, quantum=2):
                 time += idle_time
                 continue
             else:
-                break  # No more processes to schedule
-
-        # Perform the lottery: pick a random ticket
+                break  
         winning_ticket = random.randint(0, total_tickets - 1)
         winner = None
         for p in queue:
@@ -55,20 +52,18 @@ def lottery_scheduling(processes, quantum=2):
                 winner = p
                 break
 
-        # Remove the winner from the queue to process it
         queue.remove(winner)
 
         if winner.start_time == -1:
             winner.start_time = time
             winner.response_time = time - winner.arrival_time
 
-        # Execute for quantum or remaining time, whichever is smaller
+        
         exec_time = min(winner.remaining_time, quantum)
         time += exec_time
         winner.remaining_time -= exec_time
         timeline.append((winner.pid, exec_time))
 
-        # Add back to queue if not finished
         if winner.remaining_time > 0:
             queue.append(winner)
         else:
