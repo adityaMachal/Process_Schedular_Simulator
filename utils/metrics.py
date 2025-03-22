@@ -17,10 +17,12 @@ def print_algorithm_info(algo):
     print("="*40 + "\n")
 
 def print_process_table(processes):
+    # Sort processes by PID for consistent ordering in the table
+    sorted_processes = sorted(processes, key=lambda p: p.pid)
     table = [[
         p.pid, p.arrival_time, p.burst_time, p.priority if p.priority is not None else "-",
         p.completion_time, p.turnaround_time, p.waiting_time, p.response_time
-    ] for p in processes]
+    ] for p in sorted_processes]
 
     headers = ["PID", "AT", "BT", "Priority", "CT", "TAT", "WT", "RT"]
     print("\nProcess Details:\n")
