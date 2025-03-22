@@ -7,6 +7,9 @@ from algorithms.rr import round_robin
 from algorithms.edf import earliest_deadline_first
 from algorithms.srtf import srtf
 from algorithms.sjf import sjf
+from algorithms.priop import preemptive_priority_scheduling
+
+
 def get_processes(priority=False, edf=False):
     processes = []
     n = int(input("Enter the number of processes: "))
