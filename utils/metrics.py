@@ -8,7 +8,8 @@ def print_algorithm_info(algo):
         "RR": "Round Robin (RR) gives each process a fixed time slice (quantum).",
         "EDF": "Earliest Deadline First (EDF) prioritizes processes with the closest deadlines.",
         "PRIO": "Priority Scheduling (Non-Preemptive) runs the highest priority available process.",
-        "PRIOP": "Priority Scheduling (Preemptive) allows priority-based preemption."
+        "PRIOP": "Priority Scheduling (Preemptive) allows priority-based preemption.",
+        "LOTTERY": "Lottery Scheduling assigns tickets to processes; a random draw determines execution order."
     }
     print("\n" + "="*40)
     print(f"  {algo} Scheduling Algorithm")

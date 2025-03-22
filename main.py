@@ -2,13 +2,13 @@ from utils.process import Process
 from utils.metrics import print_algorithm_info, calculate_metrics
 from utils.visualization import draw_gantt_chart
 from algorithms.fcfs import fcfs
-from algorithms.prio import priority_scheduling
+from algorithms.sjf import sjf
+from algorithms.srtf import srtf
 from algorithms.rr import round_robin
 from algorithms.edf import earliest_deadline_first
-from algorithms.srtf import srtf
-from algorithms.sjf import sjf
+from algorithms.prio import priority_scheduling
 from algorithms.priop import preemptive_priority_scheduling
-
+from algorithms.lottery import lottery_scheduling
 
 def get_processes(priority=False, edf=False):
     processes = []
@@ -31,11 +31,11 @@ def get_processes(priority=False, edf=False):
     return processes
 
 def main():
-    algo = input("Choose Scheduling Algorithm (FCFS, SJF, SRTF, RR, EDF, PRIO, PRIOP): ").strip().upper()
+    algo = input("Choose Scheduling Algorithm (FCFS, SJF, SRTF, RR, EDF, PRIO, PRIOP, LOTTERY): ").strip().upper()
 
     if algo == "EDF":
         processes = get_processes(edf=True)
-    elif algo in ["PRIO", "PRIOP"]:
+    elif algo in ["PRIO", "PRIOP", "LOTTERY"]:
         processes = get_processes(priority=True)
     else:
         processes = get_processes()
@@ -57,6 +57,9 @@ def main():
         result, timeline = priority_scheduling(processes, preemptive=False)
     elif algo == "PRIOP":
         result, timeline = preemptive_priority_scheduling(processes)
+    elif algo == "LOTTERY":
+        quantum = int(input("Enter time quantum: "))
+        result, timeline = lottery_scheduling(processes, quantum)
     else:
         print("Invalid choice!")
         return
