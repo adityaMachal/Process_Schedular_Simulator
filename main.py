@@ -4,6 +4,9 @@ from utils.visualization import draw_gantt_chart
 from algorithms.fcfs import fcfs
 from algorithms.prio import priority_scheduling
 from algorithms.rr import round_robin
+from algorithms.edf import earliest_deadline_first
+from algorithms.srtf import srtf
+from algorithms.sjf import sjf
 def get_processes(priority=False, edf=False):
     processes = []
     n = int(input("Enter the number of processes: "))
