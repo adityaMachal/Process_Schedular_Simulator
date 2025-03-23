@@ -19,5 +19,5 @@ This project simulates various CPU scheduling algorithms, including FCFS, SJF, S
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/scheduling_algorithms.git
+   git clone https://github.com/adityaMacahal/scheduling_algorithms.git
    cd scheduling_algorithms
