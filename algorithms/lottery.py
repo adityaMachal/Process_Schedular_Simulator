@@ -2,18 +2,15 @@ from utils.process import Process
 import random
 from collections import deque
 
-def lottery_scheduling(processes, quantum=2):
+def lottery_scheduling(processes):
     """
-    Lottery Scheduling Algorithm:
-    - Each process is assigned a number of tickets based on priority (higher priority = more tickets).
-    - A random lottery determines which process runs next for a fixed quantum.
+    Non-Preemptive Lottery Scheduling Algorithm (With User-Provided Tickets):
+    - Each process has a user-specified number of tickets.
+    - A random lottery selects the next process from the ready queue.
+    - The selected process runs to completion without interruption.
     - Processes with more tickets have a higher chance of being selected.
     """
-    if quantum <= 0:
-        print("Quantum must be greater than 0. Setting default to 2.")
-        quantum = 2
-
-    # Sort processes by arrival time to handle arrivals correctly
+    # Sort processes by arrival time to process arrivals in order
     processes.sort(key=lambda p: p.arrival_time)
     time = 0
     timeline = []
@@ -21,20 +18,21 @@ def lottery_scheduling(processes, quantum=2):
     index = 0
     n = len(processes)
 
-    # Assign tickets based on priority (higher priority = lower number = more tickets)
-    # If no priority is provided, assume equal tickets (e.g., 100 tickets each)
+    # Use the user-provided ticket counts
     ticket_counts = {}
     for p in processes:
-        tickets = p.priority if p.priority is not None else 100  # Default 100 tickets if no priority
-        tickets = max(1, 1000 - tickets * 100)  # Convert priority to tickets (lower priority value = more tickets)
-        ticket_counts[p.pid] = tickets
+        if p.tickets is None or p.tickets < 1:
+            raise ValueError(f"Process {p.pid} must have a positive number of tickets for Lottery Scheduling.")
+        ticket_counts[p.pid] = p.tickets
 
+    # Main scheduling loop
     while index < n or queue:
-        # Add arriving processes to the queue
+        # Add all processes that have arrived by the current time to the queue
         while index < n and processes[index].arrival_time <= time:
             queue.append(processes[index])
             index += 1
 
+        # If queue is empty, CPU is idle until the next process arrives
         if not queue:
             if index < n:
                 idle_time = processes[index].arrival_time - time
@@ -44,46 +42,35 @@ def lottery_scheduling(processes, quantum=2):
             else:
                 break  # No more processes to schedule
 
-        # Calculate total tickets for processes currently in the queue
-        total_tickets = 0
-        ticket_mapping = {}
+        # Perform lottery to select the next process
+        total_tickets = sum(ticket_counts[p.pid] for p in queue)
+        winning_ticket = random.randint(0, total_tickets - 1)
+        cumulative = 0
+        winner = None
         for p in queue:
             tickets = ticket_counts[p.pid]
-            ticket_mapping[p.pid] = (total_tickets, total_tickets + tickets - 1)
-            total_tickets += tickets
+            cumulative += tickets
+            if winning_ticket < cumulative:
+                winner = p
+                break
 
-        if total_tickets == 0:  # Edge case: no tickets assigned
-            continue
-
-        # Perform the lottery: pick a random ticket
-        winner = None
-        while winner is None:  # Keep trying until a winner is found
-            winning_ticket = random.randint(0, total_tickets - 1)
-            for p in queue:
-                start, end = ticket_mapping[p.pid]
-                if start <= winning_ticket <= end:
-                    winner = p
-                    break
-
-        # Remove the winner from the queue to process it
+        # Remove the winner from the queue to execute it
         queue.remove(winner)
 
+        # Set start and response time if this is the process's first execution
         if winner.start_time == -1:
             winner.start_time = time
             winner.response_time = time - winner.arrival_time
 
-        # Execute for quantum or remaining time, whichever is smaller
-        exec_time = min(winner.remaining_time, quantum)
+        # Run the process to completion (non-preemptive)
+        exec_time = winner.remaining_time
         time += exec_time
         winner.remaining_time -= exec_time
         timeline.append((winner.pid, exec_time))
 
-        # Add back to queue if not finished
-        if winner.remaining_time > 0:
-            queue.append(winner)
-        else:
-            winner.completion_time = time
-            winner.turnaround_time = winner.completion_time - winner.arrival_time
-            winner.waiting_time = winner.turnaround_time - winner.burst_time
+        # Update process metrics
+        winner.completion_time = time
+        winner.turnaround_time = winner.completion_time - winner.arrival_time
+        winner.waiting_time = winner.turnaround_time - winner.burst_time
 
     return processes, timeline

@@ -9,7 +9,7 @@ def print_algorithm_info(algo):
         "EDF": "Earliest Deadline First (EDF) prioritizes processes with the closest deadlines.",
         "PRIO": "Priority Scheduling (Non-Preemptive) runs the highest priority available process.",
         "PRIOP": "Priority Scheduling (Preemptive) allows priority-based preemption.",
-        "LOTTERY": "Lottery Scheduling assigns tickets to processes; a random draw determines execution order."
+        "LOTTERY": "Non-Preemptive Lottery Scheduling uses user-provided tickets for each process; a random draw determines which process runs to completion."
     }
     print("\n" + "="*40)
     print(f"  {algo} Scheduling Algorithm")
@@ -17,20 +17,31 @@ def print_algorithm_info(algo):
     print(descriptions.get(algo, "Invalid Algorithm"))
     print("="*40 + "\n")
 
-def print_process_table(processes):
+def print_process_table(processes, algo=""):
     # Sort processes by PID for consistent ordering in the table
     sorted_processes = sorted(processes, key=lambda p: p.pid)
-    table = [[
-        p.pid, p.arrival_time, p.burst_time, p.priority if p.priority is not None else "-",
-        p.completion_time, p.turnaround_time, p.waiting_time, p.response_time
-    ] for p in sorted_processes]
+    
+    # Adjust table columns based on the algorithm
+    if algo == "LOTTERY":
+        # For Lottery, show tickets instead of priority
+        table = [[
+            p.pid, p.arrival_time, p.burst_time, p.tickets,
+            p.completion_time, p.turnaround_time, p.waiting_time, p.response_time
+        ] for p in sorted_processes]
+        headers = ["PID", "AT", "BT", "Tickets", "CT", "TAT", "WT", "RT"]
+    else:
+        # For other algorithms, show priority
+        table = [[
+            p.pid, p.arrival_time, p.burst_time, p.priority if p.priority is not None else "-",
+            p.completion_time, p.turnaround_time, p.waiting_time, p.response_time
+        ] for p in sorted_processes]
+        headers = ["PID", "AT", "BT", "Priority", "CT", "TAT", "WT", "RT"]
 
-    headers = ["PID", "AT", "BT", "Priority", "CT", "TAT", "WT", "RT"]
     print("\nProcess Details:\n")
     print(tabulate(table, headers=headers, tablefmt="fancy_grid"))
 
-def calculate_metrics(processes, timeline):
-    print_process_table(processes)
+def calculate_metrics(processes, timeline, algo=""):
+    print_process_table(processes, algo)
     
     avg_tat = sum(p.turnaround_time for p in processes) / len(processes)
     avg_wt = sum(p.waiting_time for p in processes) / len(processes)

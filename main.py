@@ -10,7 +10,7 @@ from algorithms.prio import priority_scheduling
 from algorithms.priop import preemptive_priority_scheduling
 from algorithms.lottery import lottery_scheduling
 
-def get_processes(priority=False, edf=False):
+def get_processes(priority=False, edf=False, tickets=False):
     processes = []
     n = int(input("Enter the number of processes: "))
 
@@ -20,13 +20,17 @@ def get_processes(priority=False, edf=False):
         
         priority_val = None
         if priority:
-            priority_val = int(input(f"Enter Priority for Process {i} (lower is higher priority): "))
+            priority_val = int(input(f"Enter Priority for Process {i} (lower is higher priority, press Enter to skip for Lottery): ") or None)
 
         deadline = None
         if edf:
             deadline = int(input(f"Enter Deadline for Process {i}: "))
 
-        processes.append(Process(i, at, bt, priority_val, deadline))
+        tickets_val = None
+        if tickets:
+            tickets_val = int(input(f"Enter number of tickets for Process {i}: "))
+
+        processes.append(Process(i, at, bt, priority_val, deadline, tickets_val))
     
     return processes
 
@@ -35,8 +39,10 @@ def main():
 
     if algo == "EDF":
         processes = get_processes(edf=True)
-    elif algo in ["PRIO", "PRIOP", "LOTTERY"]:
+    elif algo in ["PRIO", "PRIOP"]:
         processes = get_processes(priority=True)
+    elif algo == "LOTTERY":
+        processes = get_processes(tickets=True)
     else:
         processes = get_processes()
 
@@ -58,14 +64,24 @@ def main():
     elif algo == "PRIOP":
         result, timeline = preemptive_priority_scheduling(processes)
     elif algo == "LOTTERY":
-        quantum = int(input("Enter time quantum: "))
-        result, timeline = lottery_scheduling(processes, quantum)
+        result, timeline = lottery_scheduling(processes)
     else:
         print("Invalid choice!")
         return
 
-    calculate_metrics(result, timeline)
-    draw_gantt_chart(timeline)
+    calculate_metrics(result, timeline, algo)
+
+    # Debug: Print the timeline to verify its contents
+    print("\nTimeline before drawing Gantt chart:", timeline)
+
+    # Draw the Gantt chart
+    try:
+        if timeline:  # Only draw if timeline is not empty
+            draw_gantt_chart(timeline)
+        else:
+            print("Cannot draw Gantt chart: Timeline is empty.")
+    except Exception as e:
+        print(f"Error drawing Gantt chart: {e}")
 
 if __name__ == "__main__":
     main()
