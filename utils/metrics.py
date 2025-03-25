@@ -18,19 +18,19 @@ def print_algorithm_info(algo):
     print("="*40 + "\n")
 
 def print_process_table(processes, algo=""):
-    # Sort processes by PID for consistent ordering in the table
+   
     sorted_processes = sorted(processes, key=lambda p: p.pid)
     
-    # Adjust table columns based on the algorithm
+   
     if algo == "LOTTERY":
-        # For Lottery, show tickets instead of priority
+       
         table = [[
             p.pid, p.arrival_time, p.burst_time, p.tickets,
             p.completion_time, p.turnaround_time, p.waiting_time, p.response_time
         ] for p in sorted_processes]
         headers = ["PID", "AT", "BT", "Tickets", "CT", "TAT", "WT", "RT"]
     else:
-        # For other algorithms, show priority
+    
         table = [[
             p.pid, p.arrival_time, p.burst_time, p.priority if p.priority is not None else "-",
             p.completion_time, p.turnaround_time, p.waiting_time, p.response_time

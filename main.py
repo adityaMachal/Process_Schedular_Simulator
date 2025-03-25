@@ -71,12 +71,12 @@ def main():
 
     calculate_metrics(result, timeline, algo)
 
-    # Debug: Print the timeline to verify its contents
+   
     print("\nTimeline before drawing Gantt chart:", timeline)
 
-    # Draw the Gantt chart
+  
     try:
-        if timeline:  # Only draw if timeline is not empty
+        if timeline: 
             draw_gantt_chart(timeline)
         else:
             print("Cannot draw Gantt chart: Timeline is empty.")

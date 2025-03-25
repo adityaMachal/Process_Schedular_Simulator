@@ -6,7 +6,7 @@ class Process:
         self.remaining_time = burst_time
         self.priority = priority
         self.deadline = deadline
-        self.tickets = tickets  # New attribute for Lottery algorithm
+        self.tickets = tickets
         self.start_time = -1
         self.completion_time = 0
         self.waiting_time = 0
